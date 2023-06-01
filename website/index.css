@@ -1,0 +1,8 @@
+div.scrollmenu {
+    overflow: auto;
+    white-space: nowrap;
+}
+
+div.scrollmenu button {
+    display: inline-block;
+}

@@ -1,0 +1,27 @@
+<html>
+
+<head>
+    <title>fos app store</title>
+
+    <script src="index.js" defer></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div id="info">Hewwo</div>
+
+    <a id="notLoggedIn" , style="display: block;" ,
+        href="https://discord.com/api/oauth2/authorize?client_id=1113125440710770709&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fdiscord_auth&response_type=code&scope=identify">
+        login with discord
+    </a>
+
+    <div id="loggedIn" style="display: none;">
+        <p>you are logged in</p>
+        <a href="/logout">log out</a>
+
+        <div class="scrollmenu" id="appList">
+        </div>
+    </div>
+</body>
+
+</html>

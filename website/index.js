@@ -17,6 +17,8 @@ function getCookie(cname) {
 
 // useful variables
 let myId = ""
+let selectedApp = -1
+let myApps = []
 
 // new app
 function newFosApp() {
@@ -43,8 +45,24 @@ function button_action(button, id, buttons) {
     for (let i = 0; i < buttons.length; i++) {
         buttons[i].disabled = false
     }
-
+    
+    selectedApp = id
     button.disabled = true
+
+    fetch(`./api/getApp?id=${id}`, {
+        method:"GET"
+    }).then(res => res.text()).then((text) => {
+        console.log(text)
+    })
+
+    selectApp()
+}
+
+function selectApp() {
+    const appName = document.getElementById("appName")
+    
+    appName.disabled = false
+    appName.value = myApps[selectedApp][3]
 }
 
 // buttons for app lists
@@ -55,6 +73,7 @@ async function generateAppListButtons() {
     appList.innerHTML = ""
 
     const buttons = []
+    myApps = []
 
     for (let i = 0; i < list.length; i++) {
         const data = list[i].match("^([^;]*);([^;]*);(.*)")
@@ -70,6 +89,11 @@ async function generateAppListButtons() {
             appList.appendChild(button)
 
             buttons.push(button)
+            myApps.push(data)
+
+            if (selectedApp == data[1]) {
+                button.disabled = true
+            }
         }
     }
 

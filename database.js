@@ -34,11 +34,34 @@ database.list = async () => {
                 resolve(rows)
             })
         })
-    });
+    })
 
     db.close()
 
     return list
+}
+
+// get
+database.get = async (id) => {
+    const db = new sqlite3.Database('database.db')
+
+    const data = await new Promise((resolve, reject) => {
+        db.get(
+            'SELECT source FROM apps WHERE id = ?',
+            id,
+            (err, rows) => {
+                if (rows && err == null) {
+                    resolve(rows.source)
+                } else {
+                    resolve("")
+                }
+            }
+        )
+    })
+
+    db.close()
+
+    return data
 }
 
 // database.add("foxgirls <3", "no source code found", "")

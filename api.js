@@ -43,11 +43,21 @@ post_api["/newApp"] = async (req, res) => {
 
     res.setHeader('Content-Type', 'application/json')
 
-    if (name.length > 100 || name.match("[\n]")) {
+    if (name.length > 100 || name.match("\n")) {
         res.status(400)
-        return res.end()
+        return res.send("400 invalid name (> 100 || .match('\n'))")
     }
 
     db.add(name, "", id)
-    res.end()
+    res.send("success")
+}
+
+get_api["/getApp"] = async (req, res) => {
+    const id = parseInt(req.query.id);
+
+    if (isNaN(id)) {
+        return res.send("")
+    }
+
+    res.send(await db.get(id))
 }

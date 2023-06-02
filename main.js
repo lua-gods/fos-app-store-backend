@@ -24,6 +24,11 @@ app.get("/index.js", (req, res) => { res.sendFile("/website/index.js", { root: "
 app.get("/index.css", (req, res) => { res.sendFile("/website/index.css", { root: "." }) })
 
 // auth
+app.get("/discord_auth_redirect_login", (req, res) => {
+    res.redirect(process.env.login_url)
+})
+
+
 app.get("/discord_auth", (req, res) => {
     if (req.query.error) {
         res.redirect("/")
@@ -35,7 +40,7 @@ app.get("/discord_auth", (req, res) => {
     params.append('client_secret', process.env.clientSecret);
     params.append('grant_type', 'authorization_code');
     params.append('code', code);
-    params.append('redirect_uri', `http://localhost:3000/discord_auth`);
+    params.append('redirect_uri', process.env.redirect_uri);
 
     fetch('https://discord.com/api/oauth2/token', { method: "POST", body: params }).then(res => res.json()).then(data => {
         if (data.token_type != null && data.access_token != null) {

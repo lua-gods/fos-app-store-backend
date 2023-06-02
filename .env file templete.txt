@@ -1,3 +1,5 @@
 clientId=
 clientSecret=
 port=3000
+redirect_uri=
+login_url=

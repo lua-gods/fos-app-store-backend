@@ -131,7 +131,6 @@ post_api["/deleteApp"] = async (req, res) => {
     }
 
     if (db.remove(id)) {
-        console.log("REMOVED APP OR SOMETHING WITH ID: ", id)
         res.send("success")
     } else {
         res.status(400)

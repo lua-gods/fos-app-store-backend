@@ -19,10 +19,60 @@ function getCookie(cname) {
 let myId = ""
 let selectedApp = null
 let myApps = {}
+let buttons = null
 const appName = document.getElementById("appName")
 const appCode = document.getElementById("appCode")
 const appUpdate = document.getElementById("appUpdate")
 const appDelete = document.getElementById("appDelete")
+
+// popup
+function openPopup() {
+    const popup = document.getElementById("popup")
+    const popupBox = document.getElementById("popupBox")
+
+    popup.style.display = "flex"
+
+    popup.style.animation = "popupAnimOpen 0.5s cubic-bezier(0.25, 1, 0.5, 1)"
+    popupBox.style.animation = "popupAnimBoxOpen 0.5s cubic-bezier(0.25, 1, 0.5, 1)"
+}
+
+function closePopup() {
+    const popup = document.getElementById("popup")
+    const popupBox = document.getElementById("popupBox")
+    
+    popup.style.animation = "popupAnimClose 0.5s cubic-bezier(0.25, 1, 0.5, 1)"
+    popupBox.style.animation = "popupAnimBoxClose 0.5s cubic-bezier(0.25, 1, 0.5, 1)"
+
+    setTimeout(() => {
+        popup.style.display = "none"
+    }, 500)
+}
+
+document.getElementById("buttonNo").onclick = function() {
+    closePopup()
+}
+
+document.getElementById("buttonYes").onclick = function() {
+    closePopup()
+
+    const data = {
+        id: selectedApp
+    }
+
+    fetch("./api/deleteApp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            authorization: getCookie("token")
+        },
+        body: JSON.stringify(data)
+    }).then(async (res) => {
+        if (res.status == 200) {
+            unselectApp()
+            generateAppListButtons()
+        }
+    })
+}
 
 // new app
 function newFosApp() {
@@ -45,13 +95,19 @@ function newFosApp() {
 }
 
 // button action
-function button_action(button, id, buttons) {
+function button_action(button, id) {
     for (let i = 0; i < buttons.length; i++) {
         buttons[i].disabled = false
+        buttons[i].classList.remove("buttonSelectedApp")
+    }
+
+    if (selectedApp) {
+        buttons[myApps[selectedApp][4]].textContent = myApps[selectedApp][2]
     }
 
     selectedApp = id
     button.disabled = true
+    button.classList.add("buttonSelectedApp")
 
     fetch(`./api/getApp?id=${id}`, {
         method: "GET"
@@ -95,24 +151,20 @@ async function generateAppListButtons() {
     const appList = document.getElementById("appList")
     appList.innerHTML = ""
 
-    const buttons = []
+    buttons = []
     myApps = {}
 
     for (let i = 0; i < list.length; i++) {
         const data = list[i].match("^([^;]*);([^;]*);(.*)")
         // 0 = id, 1 = owner, 2 = name, 3 = code, 4 = button id
-        
+
         if (data && data[1] && data[3] && data[2] == myId) {
             data.splice(0, 1);
             data[0] = parseInt(data[0])
 
             const button = document.createElement("button")
             button.textContent = data[2]
-
-            button.onclick = function () {
-                button_action(button, data[0], buttons)
-            }
-
+            button.onclick = function () { button_action(button, data[0]) }
             appList.appendChild(button)
 
             buttons.push(button)
@@ -122,6 +174,7 @@ async function generateAppListButtons() {
             data[4] = buttons.length - 1
 
             if (selectedApp == data[0]) {
+                button.classList.add("buttonSelectedApp")
                 button.disabled = true
             }
         }
@@ -129,9 +182,8 @@ async function generateAppListButtons() {
 
     const button = document.createElement("button")
     button.textContent = "new app"
-
+    button.classList.add("newApp")
     button.onclick = newFosApp
-
     appList.appendChild(button)
 }
 
@@ -153,7 +205,7 @@ if (getCookie("token") != "") {
 }
 
 // update app
-appUpdate.onclick = function() {
+appUpdate.onclick = function () {
     const data = {
         name: appName.value,
         code: appCode.value,
@@ -169,34 +221,18 @@ appUpdate.onclick = function() {
         body: JSON.stringify(data)
     }).then(async (res) => {
         if (res.status == 200) {
-            console.log("app updated")
-        } else {
-            console.log("error", await res.text())
+            // update
+            buttons[myApps[selectedApp][4]].textContent = appName.value
+            myApps[selectedApp][2] = appName.value
         }
     })
 }
 
 // delete
-appDelete.onclick = function() {
-    const data = {
-        id: selectedApp
-    }
+appDelete.onclick = function () {
+    const textElement = document.getElementById("popupText")
 
-    fetch("./api/deleteApp", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            authorization: getCookie("token")
-        },
-        body: JSON.stringify(data)
-    }).then(async (res) => {
-        if (res.status == 200) {
-            console.log("app deleted")
-            unselectApp()
-            generateAppListButtons()
-            
-        } else {
-            console.log("error", await res.text())
-        }
-    })
+    textElement.innerText = `Are you sure you want to remove\n${myApps[selectedApp][2]}`
+
+    openPopup()
 }

@@ -1,35 +1,69 @@
+<!DOCTYPE html>
 <html>
 
 <head>
     <title>fos app store</title>
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
 
     <script src="index.js" defer></script>
     <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
-    <div id="info">Hewwo</div>
+    <h2>fos app store</h2>
 
-    <a id="notLoggedIn" style="display: block;" href="/discord_auth_redirect_login">
-        login with discord
-    </a>
+    <div style="display: block;">
+        <br>
+        <a id="notLoggedIn" href="/discord_auth_redirect_login">
+            login with discord
+        </a>
+    </div>
 
     <div id="loggedIn" style="display: none;">
-        <p>you are logged in</p>
-        <a href="/logout">log out</a>
+        <div>
+            <p class="horizontal textBackground">you are logged in</p>
+            <a href="/logout" class="horizontal">log out</a>
+        </div>
 
-        <div class="scrollmenu" id="appList"><button disabled>loading</button></div>
+        <br>
+
+        <span>your apps:</span>
+        <p style="font-size: 2px;"></p>
+        <div class="scrollmenu" id="appList"><button disabled class="button">loading</button></div>
 
         <div class="appSettings">
-            <p>App name:</p>
+            <br>
+            <span>name:</span>
+            <br>
+            <p style="font-size: 2px;"></p>
             <input type="text" id="appName" maxlength="100" disabled>
-            <p>App source:</p>
+            <br>
+            <br>
+            <span>code:</span>
+            <p style="font-size: 2px;"></p>
             <div class="appCodeEditor">
-                <textarea id="appCode" class="appCode" rows="10" cols="50" disabled></textarea>
+                <textarea id="appCode" class="appCode" rows="10" cols="50" spellcheck="false" disabled></textarea>
             </div>
+            <p style="font-size: 8px;"></p>
+            <div>
+                <button id="appUpdate" disabled>update app</button>
+                <button id="appDelete" disabled>delete app</button>
+            </div>
+            <p style="font-size: 8px;"></p>
+        </div>
+    </div>
 
-            <button id="appUpdate" disabled>update app</button>
-            <button id="appDelete" disabled>delete app</button>
+    <br>
+    <a href="https://github.com/lua-gods/fos-app-store-backend" class="button link">source code</a>
+
+    <div class="popup" id="popup" style="display: none;">
+        <div class="popupBox" id="popupBox">
+            <p id="popupText">no text</p>
+            <div class="text-right">
+                <button class="buttonNo" id="buttonNo">no</button>
+                <button class="buttonYes" id="buttonYes">yes</button>
+            </div>
         </div>
     </div>
 </body>

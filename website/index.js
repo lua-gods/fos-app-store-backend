@@ -17,8 +17,12 @@ function getCookie(cname) {
 
 // useful variables
 let myId = ""
-let selectedApp = -1
-let myApps = []
+let selectedApp = null
+let myApps = {}
+const appName = document.getElementById("appName")
+const appCode = document.getElementById("appCode")
+const appUpdate = document.getElementById("appUpdate")
+const appDelete = document.getElementById("appDelete")
 
 // new app
 function newFosApp() {
@@ -27,7 +31,7 @@ function newFosApp() {
     }
 
     fetch("./api/newApp", {
-        method:"POST",
+        method: "POST",
         headers: {
             "Content-Type": "application/json",
             authorization: getCookie("token")
@@ -45,24 +49,43 @@ function button_action(button, id, buttons) {
     for (let i = 0; i < buttons.length; i++) {
         buttons[i].disabled = false
     }
-    
+
     selectedApp = id
     button.disabled = true
 
     fetch(`./api/getApp?id=${id}`, {
-        method:"GET"
+        method: "GET"
     }).then(res => res.text()).then((text) => {
-        console.log(text)
-    })
+        myApps[selectedApp][3] = text
 
-    selectApp()
+        selectApp()
+    })
 }
 
 function selectApp() {
-    const appName = document.getElementById("appName")
-    
     appName.disabled = false
-    appName.value = myApps[selectedApp][3]
+    appName.value = myApps[selectedApp][2]
+
+    appCode.disabled = false
+    appCode.value = myApps[selectedApp][3]
+
+    appUpdate.disabled = false
+
+    appDelete.disabled = false
+}
+
+function unselectApp() {
+    appName.disabled = true
+    appName.value = ""
+
+    appCode.disabled = true
+    appCode.value = ""
+
+    appUpdate.disabled = true
+
+    appDelete.disabled = true
+
+    selectedApp = null
 }
 
 // buttons for app lists
@@ -73,25 +96,32 @@ async function generateAppListButtons() {
     appList.innerHTML = ""
 
     const buttons = []
-    myApps = []
+    myApps = {}
 
     for (let i = 0; i < list.length; i++) {
         const data = list[i].match("^([^;]*);([^;]*);(.*)")
-
+        // 0 = id, 1 = owner, 2 = name, 3 = code, 4 = button id
+        
         if (data && data[1] && data[3] && data[2] == myId) {
+            data.splice(0, 1);
+            data[0] = parseInt(data[0])
+
             const button = document.createElement("button")
-            button.textContent = data[3]
-            
+            button.textContent = data[2]
+
             button.onclick = function () {
-                button_action(button, data[1], buttons)
+                button_action(button, data[0], buttons)
             }
-            
+
             appList.appendChild(button)
 
             buttons.push(button)
-            myApps.push(data)
 
-            if (selectedApp == data[1]) {
+            myApps[data[0]] = data
+
+            data[4] = buttons.length - 1
+
+            if (selectedApp == data[0]) {
                 button.disabled = true
             }
         }
@@ -122,3 +152,51 @@ if (getCookie("token") != "") {
     })
 }
 
+// update app
+appUpdate.onclick = function() {
+    const data = {
+        name: appName.value,
+        code: appCode.value,
+        id: selectedApp
+    }
+
+    fetch("./api/updateApp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            authorization: getCookie("token")
+        },
+        body: JSON.stringify(data)
+    }).then(async (res) => {
+        if (res.status == 200) {
+            console.log("app updated")
+        } else {
+            console.log("error", await res.text())
+        }
+    })
+}
+
+// delete
+appDelete.onclick = function() {
+    const data = {
+        id: selectedApp
+    }
+
+    fetch("./api/deleteApp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            authorization: getCookie("token")
+        },
+        body: JSON.stringify(data)
+    }).then(async (res) => {
+        if (res.status == 200) {
+            console.log("app deleted")
+            unselectApp()
+            generateAppListButtons()
+            
+        } else {
+            console.log("error", await res.text())
+        }
+    })
+}

@@ -10,8 +10,7 @@
 <body>
     <div id="info">Hewwo</div>
 
-    <a id="notLoggedIn" , style="display: block;" ,
-        href="/discord_auth_redirect_login">
+    <a id="notLoggedIn" style="display: block;" href="/discord_auth_redirect_login">
         login with discord
     </a>
 
@@ -20,7 +19,18 @@
         <a href="/logout">log out</a>
 
         <div class="scrollmenu" id="appList"><button disabled>loading</button></div>
-        <input type="text" id="appName" maxlength="100" disabled>
+
+        <div class="appSettings">
+            <p>App name:</p>
+            <input type="text" id="appName" maxlength="100" disabled>
+            <p>App source:</p>
+            <div class="appCodeEditor">
+                <textarea id="appCode" class="appCode" rows="10" cols="50" disabled></textarea>
+            </div>
+
+            <button id="appUpdate" disabled>update app</button>
+            <button id="appDelete" disabled>delete app</button>
+        </div>
     </div>
 </body>
 

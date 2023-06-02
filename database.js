@@ -3,30 +3,22 @@ module.exports = database
 
 const sqlite3 = require("sqlite3")
 
-// init
-const db = new sqlite3.Database('database.db')
+let db = new sqlite3.Database('database.db')
 
+// init
 db.serialize(function () {
     db.run("CREATE TABLE IF NOT EXISTS apps (id INTEGER PRIMARY KEY, name TEXT, source TEXT, owner TEXT)")
 })
 
-db.close()
-
 // add
 database.add = (name, source, owner) => {
-    const db = new sqlite3.Database('database.db')
-
     db.serialize(function () {
         db.run("INSERT INTO apps (name, source, owner) VALUES (?, ?, ?)", name, source, owner)
     })
-
-    db.close()
 }
 
 // list
 database.list = async () => {
-    const db = new sqlite3.Database('database.db')
-
     const list = await new Promise(function (resolve, reject) {
         db.serialize(function () {
             db.all("SELECT id, name, owner FROM apps", (err, rows) => {
@@ -36,32 +28,48 @@ database.list = async () => {
         })
     })
 
-    db.close()
-
     return list
 }
 
 // get
 database.get = async (id) => {
-    const db = new sqlite3.Database('database.db')
-
     const data = await new Promise((resolve, reject) => {
         db.get(
-            'SELECT source FROM apps WHERE id = ?',
+            'SELECT source, owner FROM apps WHERE id = ?',
             id,
             (err, rows) => {
                 if (rows && err == null) {
-                    resolve(rows.source)
+                    resolve(rows)
                 } else {
-                    resolve("")
+                    resolve(null)
                 }
             }
         )
     })
 
-    db.close()
-
     return data
 }
 
-// database.add("foxgirls <3", "no source code found", "")
+// set
+database.set = async (id, name, source) => {
+    return await new Promise((resolve, reject) => {
+        db.run("UPDATE apps SET name = ?, source = ? WHERE id = ?", [name, source, id], function (err) {
+            if (err) {
+                resolve(false)
+            }
+            resolve(true)
+        })
+    })
+}
+
+// remove
+database.remove = async (id) => {
+    return await new Promise((resolve, reject) => {
+        db.run("DELETE FROM apps WHERE id = ?", [id], function(err) {
+            if (err) {
+                resolve(false)
+            }
+            resolve(true)
+        })
+    })
+}

@@ -41,8 +41,6 @@ post_api["/newApp"] = async (req, res) => {
 
     const name = `${req.body.name}`
 
-    res.setHeader('Content-Type', 'application/json')
-
     if (name.length > 100 || name.match("\n")) {
         res.status(400)
         return res.send("400 invalid name (> 100 || .match('\n'))")
@@ -59,5 +57,84 @@ get_api["/getApp"] = async (req, res) => {
         return res.send("")
     }
 
-    res.send(await db.get(id))
+    const app = await db.get(id)
+    if (app) {
+        res.send(app.source)
+    } else {
+        res.send("")
+    }
+
+}
+
+post_api["/updateApp"] = async (req, res) => {
+    const user_id = await auth.getId(req.get("authorization"))
+    if (user_id == null) {
+        return unauthorized(res)
+    }
+
+    const name = `${req.body.name}`
+    const code = `${req.body.code}`
+    const id = parseInt(req.body.id)
+
+    if (name.length > 100 || name.match("\n")) {
+        res.status(400)
+        return res.send("400 invalid name (> 100 || .match('\n'))")
+    }
+    
+    if (isNaN(id)) {
+        res.status(400)
+        return res.send("400 invalid id")
+    }
+
+    const data = await db.get(id)
+
+    if (data == null) {
+        res.status(400)
+        return res.send("400 invalid id")
+    }
+
+    if (data.owner != user_id) {
+        return unauthorized(res)
+    }
+
+    if (db.set(id, name, code)) {
+        res.status(200)
+        res.send("success")
+    } else {
+        res.status(400)
+        res.send("unknown error")
+    }
+}
+
+post_api["/deleteApp"] = async (req, res) => {
+    const user_id = await auth.getId(req.get("authorization"))
+    if (user_id == null) {
+        return unauthorized(res)
+    }
+
+    const id = parseInt(req.body.id)
+    
+    if (isNaN(id)) {
+        res.status(400)
+        return res.send("400 invalid id")
+    }
+
+    const data = await db.get(id)
+
+    if (data == null) {
+        res.status(400)
+        return res.send("400 invalid id")
+    }
+
+    if (data.owner != user_id) {
+        return unauthorized(res)
+    }
+
+    if (db.remove(id)) {
+        console.log("REMOVED APP OR SOMETHING WITH ID: ", id)
+        res.send("success")
+    } else {
+        res.status(400)
+        res.send("unknown error")
+    }
 }

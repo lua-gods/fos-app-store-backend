@@ -17,13 +17,16 @@ function getCookie(cname) {
 
 // useful variables
 let myId = ""
+let myUsername = ""
 let selectedApp = null
 let myApps = {}
 let buttons = null
 const appName = document.getElementById("appName")
+const appDescription = document.getElementById("appDescription")
 const appCode = document.getElementById("appCode")
 const appUpdate = document.getElementById("appUpdate")
 const appDelete = document.getElementById("appDelete")
+const username = document.getElementById("username")
 
 // popup
 function openPopup() {
@@ -114,7 +117,13 @@ function button_action(button, id) {
     }).then(res => res.text()).then((text) => {
         myApps[selectedApp][3] = text
 
-        selectApp()
+        fetch(`./api/getDescription?id=${id}`, {
+            method: "GET"
+        }).then(res => res.text()).then((text) => {
+            myApps[selectedApp][5] = text
+    
+            selectApp()
+        })
     })
 }
 
@@ -124,6 +133,9 @@ function selectApp() {
 
     appCode.disabled = false
     appCode.value = myApps[selectedApp][3]
+
+    appDescription.disabled = false
+    appDescription.value = myApps[selectedApp][5]
 
     appUpdate.disabled = false
 
@@ -136,6 +148,9 @@ function unselectApp() {
 
     appCode.disabled = true
     appCode.value = ""
+
+    appDescription.disabled = true
+    appDescription.value = ""
 
     appUpdate.disabled = true
 
@@ -155,12 +170,11 @@ async function generateAppListButtons() {
     myApps = {}
 
     for (let i = 0; i < list.length; i++) {
-        const data = list[i].match("^([^;]*);([^;]*);(.*)")
-        // 0 = id, 1 = owner, 2 = name, 3 = code, 4 = button id
+        const data = list[i].match(/^([^;]*);([^;]*);(.*)/)
+        // 0 = id, 1 = owner, 2 = name, 3 = code, 4 = button id, 5 = app description
 
         if (data && data[1] && data[3] && data[2] == myId) {
             data.splice(0, 1);
-            data[0] = parseInt(data[0])
 
             const button = document.createElement("button")
             button.textContent = data[2]
@@ -182,7 +196,7 @@ async function generateAppListButtons() {
 
     const button = document.createElement("button")
     button.textContent = "new app"
-    button.classList.add("newApp")
+    button.classList.add("buttonGreen")
     button.onclick = newFosApp
     appList.appendChild(button)
 }
@@ -202,6 +216,27 @@ if (getCookie("token") != "") {
 
         generateAppListButtons()
     })
+
+    fetch("./api/id", {
+        method: "GET",
+        headers: {
+            authorization: getCookie("token")
+        }
+    }).then(res => res.text()).then((id) => {
+        myId = id
+        generateAppListButtons()
+    })
+
+    fetch("./api/getName", {
+        method: "GET",
+        headers: {
+            authorization: getCookie("token")
+        }
+    }).then(res => res.text()).then((name) => {
+        myUsername = name
+        username.value = name
+        username.disabled = false
+    })
 }
 
 // update app
@@ -209,6 +244,7 @@ appUpdate.onclick = function () {
     const data = {
         name: appName.value,
         code: appCode.value,
+        description: appDescription.value,
         id: selectedApp
     }
 
@@ -235,4 +271,59 @@ appDelete.onclick = function () {
     textElement.innerText = `Are you sure you want to remove\n${myApps[selectedApp][2]}`
 
     openPopup()
+}
+
+// username change
+function updateUsernameConfirm() {
+    const usernameConfirm = document.getElementById("usernameConfirm")
+
+    const wasEnabled = usernameConfirm.style.display != "none"
+    const shouldEnable = username.value != myUsername
+
+    if (shouldEnable == wasEnabled) {
+        return
+    }
+    
+    if (shouldEnable) {
+        usernameConfirm.style.animation = "usernameChangeOpen 0.5s cubic-bezier(0.25, 1, 0.5, 1)"
+        usernameConfirm.style.display = "block"
+    } else {
+        usernameConfirm.style.animation = "usernameChangeClose 0.5s cubic-bezier(0.25, 1, 0.5, 1)"
+        setTimeout(() => {
+            usernameConfirm.style.display = "none"
+        }, 480)
+    }
+}
+
+username.addEventListener("input", updateUsernameConfirm)
+username.addEventListener("keup", updateUsernameConfirm)
+username.addEventListener("kedown", updateUsernameConfirm)
+
+document.getElementById("usernameButtonCancel").onclick = function() {
+    username.value = myUsername
+    updateUsernameConfirm()
+}
+
+document.getElementById("usernameButtonConfirm").onclick = function() {
+    const data = {
+        name: username.value
+    }
+
+    fetch("./api/setName", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            authorization: getCookie("token")
+        },
+        body: JSON.stringify(data)
+    }).then(async (res) => {
+        if (res.status == 200) {
+            const text = await res.text()
+            myUsername = text
+            username.value = text
+            updateUsernameConfirm()
+        } else {
+            username.value = myUsername
+        }
+    })
 }

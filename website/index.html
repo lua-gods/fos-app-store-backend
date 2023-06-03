@@ -22,10 +22,16 @@
 
     <div id="loggedIn" style="display: none;">
         <div>
-            <p class="horizontal textBackground">you are logged in</p>
+            <input type="text" id="username" maxlength="128" value="loading" class="buttonBig" disabled></input>
             <a href="/logout" class="horizontal">log out</a>
+            <p style="font-size: 4px;"></p>
+            <div id="usernameConfirm" class="usernameConfirm" style="display: none;">
+                <button id="usernameButtonCancel">cancel</button>
+                <button id="usernameButtonConfirm" class="buttonGreen">Change Username</button>
+            </div>
         </div>
 
+        <br>
         <br>
 
         <span>your apps:</span>
@@ -37,7 +43,13 @@
             <span>name:</span>
             <br>
             <p style="font-size: 2px;"></p>
-            <input type="text" id="appName" maxlength="100" disabled>
+            <input type="text" id="appName" maxlength="64" disabled></input>
+            <br>
+            <br>
+            <span>description:</span>
+            <br>
+            <p style="font-size: 2px;"></p>
+            <textarea id="appDescription" maxlength="512" rows="5" cols="50" spellcheck="false" disabled></textarea>
             <br>
             <br>
             <span>code:</span>
@@ -61,7 +73,7 @@
         <div class="popupBox" id="popupBox">
             <p id="popupText">no text</p>
             <div class="text-right">
-                <button class="buttonNo" id="buttonNo">no</button>
+                <button id="buttonNo">no</button>
                 <button class="buttonYes" id="buttonYes">yes</button>
             </div>
         </div>

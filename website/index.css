@@ -6,9 +6,9 @@
         --button-hover: #535353;
         --button-click: #696969;
         --button-selectedApp: #d44f7b;
-        --button-newApp: #4fb446;
-        --button-newApp-hover: #5fd654;
-        --button-newApp-click: #82fa77;
+        --button-green: #2a8921;
+        --button-green-hover: #39af2f;
+        --button-green-click: #48ca3d;
         --text-color: #FFFFFF;
         --link-color: #1470a6;
         --link-color-hover: #2293d5;
@@ -27,16 +27,16 @@
         --button-hover: #c8c8c8;
         --button-click: #bababa;
         --button-selectedApp: #ff88aa;
-        --button-newApp: #acff88;
-        --button-newApp-hover: #85ff51;
-        --button-newApp-click: #64dd30;
+        --button-green: #acff88;
+        --button-green-hover: #85ff51;
+        --button-green-click: #64dd30;
         --text-color: #000000;
         --link-color: #86d2ff;
         --link-color-hover: #4ebeff;
         --link-color-click: #1fadff;
-        --button-popupAccept: #ff5656;
-        --button-popupAccept-hover: #d94343;
-        --button-popupAccept-click: #cd4242;
+        --button-popupAccept: #ff8686;
+        --button-popupAccept-hover: #ff6e6e;
+        --button-popupAccept-click: #ff4f4f;
     }
 }
 
@@ -97,19 +97,23 @@ button[disabled]:hover {
     border-color: var(--button-selectedApp) !important;
 }
 
-.newApp {
-    background-color: var(--button-newApp) !important;
-    border-color: var(--button-newApp) !important;
+.buttonBig {
+    border-width: 3px;
 }
 
-.newApp:hover {
-    background-color: var(--button-newApp-hover) !important;
-    border-color: var(--button-newApp-hover) !important;
+.buttonGreen {
+    background-color: var(--button-green) !important;
+    border-color: var(--button-green) !important;
 }
 
-.newApp:active {
-    background-color: var(--button-newApp-click) !important;
-    border-color: var(--button-newApp-click) !important;
+.buttonGreen:hover {
+    background-color: var(--button-green-hover) !important;
+    border-color: var(--button-green-hover) !important;
+}
+
+.buttonGreen:active {
+    background-color: var(--button-green-click) !important;
+    border-color: var(--button-green-click) !important;
 }
 
 a {
@@ -117,8 +121,11 @@ a {
     border-color: var(--link-color);
     color: var(--text-color);
     text-decoration: none;
+
     border-style: solid;
+    border-width: 3px;
     border-radius: 3px / 3px;
+
     padding: 0px;
     transition: 0.2s;
 }
@@ -219,7 +226,7 @@ button[disabled]:not(.buttonSelectedApp) {
     0% {
         opacity: 0;
     }
-    
+
     100% {
         opacity: 1;
     }
@@ -229,7 +236,7 @@ button[disabled]:not(.buttonSelectedApp) {
     0% {
         opacity: 1;
     }
-    
+
     100% {
         opacity: 0;
     }
@@ -239,7 +246,7 @@ button[disabled]:not(.buttonSelectedApp) {
     0% {
         transform: scale(0);
     }
-    
+
     100% {
         transform: scale(1);
     }
@@ -249,8 +256,38 @@ button[disabled]:not(.buttonSelectedApp) {
     0% {
         transform: scale(1);
     }
-    
+
     100% {
         transform: scale(0);
     }
+}
+
+@keyframes usernameChangeOpen {
+    0% {
+        transform: scale(1, 0);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+@keyframes usernameChangeClose {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    100% {
+        transform: scale(1, 0);
+    }
+}
+
+.usernameConfirm {
+    position: absolute;
+    transform-origin: top;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
 }

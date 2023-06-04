@@ -106,7 +106,7 @@ database.getName = async (id) => {
 // set name
 database.setName = async (id, name) => {
     await new Promise(async (resolve, reject) => {
-        if (database.getName(id) != null) {
+        if (await database.getName(id) != null) {
             // name already exist, replace
             db.run("UPDATE names SET name = ? WHERE id = ?", [name, id], () => {resolve()})
         } else {

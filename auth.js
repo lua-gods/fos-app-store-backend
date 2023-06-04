@@ -1,3 +1,5 @@
+const fetch = require('node-fetch') // fetch
+
 const auth = {}
 module.exports = auth
 

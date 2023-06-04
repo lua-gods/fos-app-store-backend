@@ -1,3 +1,6 @@
+// fetch
+const fetch = require('node-fetch')
+
 // env
 try {
     require('dotenv').config();

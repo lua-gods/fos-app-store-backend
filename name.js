@@ -1,3 +1,5 @@
+const fetch = require('node-fetch') // fetch
+
 const name = {}
 module.exports = name
 

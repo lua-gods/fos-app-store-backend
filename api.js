@@ -23,6 +23,7 @@ get_api["/id"] = async (req, res) => {
         return unauthorized(res)
     }
 
+    res.setHeader("Content-Type", "text/plain")
     res.send(id)
 }
 
@@ -33,7 +34,8 @@ get_api["/list"] = async (req, res) => {
         const name = value.name.replace("\n", "\\n")
         list.push(`${value.id};${value.owner};${name}`)
     }
-
+  
+    res.setHeader("Content-Type", "text/plain")
     res.send(list.join("\n"))
 }
 
@@ -51,10 +53,12 @@ post_api["/newApp"] = async (req, res) => {
     }
 
     db.add(name, id)
+    res.setHeader("Content-Type", "text/plain")
     res.send("success")
 }
 
 get_api["/getApp"] = async (req, res) => {
+    res.setHeader("Content-Type", "text/plain")
     const id = `${req.query.id}`
 
     const app = await db.get(id)
@@ -66,6 +70,7 @@ get_api["/getApp"] = async (req, res) => {
 }
 
 get_api["/getDescription"] = async (req, res) => {
+    res.setHeader("Content-Type", "text/plain")
     const id = `${req.query.id}`
 
     const app = await db.get(id)
@@ -77,6 +82,7 @@ get_api["/getDescription"] = async (req, res) => {
 }
 
 post_api["/updateApp"] = async (req, res) => {
+    res.setHeader("Content-Type", "text/plain")
     const user_id = await auth.getId(req.get("authorization"))
     if (user_id == null || user_id == false) {
         return unauthorized(res)
@@ -118,6 +124,7 @@ post_api["/updateApp"] = async (req, res) => {
 }
 
 post_api["/deleteApp"] = async (req, res) => {
+    res.setHeader("Content-Type", "text/plain")
     const user_id = await auth.getId(req.get("authorization"))
     if (user_id == null || user_id == false) {
         return unauthorized(res)
@@ -145,6 +152,7 @@ post_api["/deleteApp"] = async (req, res) => {
 }
 
 get_api["/getName"] = async (req, res) => {
+    res.setHeader("Content-Type", "text/plain")
     const token = req.get("authorization")
 
     if (token) {
@@ -161,6 +169,7 @@ get_api["/getName"] = async (req, res) => {
 }
 
 post_api["/setName"] = async (req, res) => {
+    res.setHeader("Content-Type", "text/plain")
     const token = req.get("authorization")
 
     const id = await auth.getId(token)
